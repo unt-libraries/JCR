@@ -7,6 +7,10 @@ Select	mp.[JCR Category],
 FROM
 (
 	SELECT	*,
+				-- seqnum is inducing an ordered row ranking that we can use to delimit upper/lower percentiles of our selected data, while cnt is a total count of rows.
+				-- At the bottom of this query, we just select where seqnum <= cnt/5, which returns any rows ranked higher than the first quintile.
+				-- For the top quartile, we would select based on "seqnum <= cnt/4", or 
+				-- for the top decile, we'd use "seqnum <= cnt/10". The same pattern extends to selecting the bottom n-tile.
 			row_number() over (partition by [JCR Category] order by [JCR Category],[Normalized Eigenfactor] DESC) as seqnum,
 			count([Journal Title]) over (partition by [JCR Category]) as cnt
 	From
